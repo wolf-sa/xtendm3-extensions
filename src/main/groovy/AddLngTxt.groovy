@@ -54,18 +54,18 @@ public class AddLngTxt extends ExtendM3Transaction {
     } else {
       dtid = 0
       DBAction query = database.table("CSLGHN").index("00").reverse().build()
-      DBContainer CSLGHN_0 = query.getContainer()
-      CSLGHN_0.set("JLCONO", currentCompany)
-      if (!query.readAll(CSLGHN_0, 1, 1, outData_CSLGHN)) {
+      DBContainer cslghn0 = query.getContainer()
+      cslghn0.set("JLCONO", currentCompany)
+      if (!query.readAll(cslghn0, 1, 1, outDataCSLGHN)) {
         dtid = 1
       }
       // Update CSYNUM
-      DBAction query_CSYNUM = database.table("CSYNUM").index("00").selection("CMCONO", "CMDIVI", "CMNBNR").build()
-      DBContainer CSYNUM = query_CSYNUM.getContainer()
+      DBAction queryCSYNUM = database.table("CSYNUM").index("00").selection("CMCONO", "CMDIVI", "CMNBNR").build()
+      DBContainer CSYNUM = queryCSYNUM.getContainer()
       CSYNUM.set("CMCONO", currentCompany)
       CSYNUM.set("CMDIVI", "")
       CSYNUM.set("CMFILE", "CSLGHN")
-      if(!query_CSYNUM.readLock(CSYNUM, updateCallBack)){
+      if(!queryCSYNUM.readLock(CSYNUM, updateCallBack)){
       }
     }
     logger.debug("dtid = " + dtid)
@@ -74,12 +74,12 @@ public class AddLngTxt extends ExtendM3Transaction {
     if(mi.in.get("TX60") != null)iDescription=mi.in.get("TX60")
     if(mi.in.get("TX15") != null)iShortDescription=mi.in.get("TX15")
     // Write CSLGHN
-    DBAction query_CSLGHN = database.table("CSLGHN").index("00").build()
-    DBContainer CSLGHN = query_CSLGHN.getContainer()
+    DBAction queryCSLGHN = database.table("CSLGHN").index("00").build()
+    DBContainer CSLGHN = queryCSLGHN.getContainer()
     CSLGHN.set("JLCONO", currentCompany)
     CSLGHN.set("JLDTID",  dtid)
     CSLGHN.set("JLLNCD",  mi.in.get("LNCD"))
-    if (!query_CSLGHN.read(CSLGHN)) {
+    if (!queryCSLGHN.read(CSLGHN)) {
       CSLGHN.set("JLTX60", iDescription)
       CSLGHN.set("JLTX15", iShortDescription)
       CSLGHN.set("JLFILE", mi.in.get("FILE"))
@@ -89,38 +89,41 @@ public class AddLngTxt extends ExtendM3Transaction {
       CSLGHN.setInt("JLLMDT", timeOfCreation.format(DateTimeFormatter.ofPattern("yyyyMMdd")) as Integer)
       CSLGHN.setInt("JLCHNO", 1)
       CSLGHN.set("JLCHID", program.getUser())
-      query_CSLGHN.insert(CSLGHN)
+      queryCSLGHN.insert(CSLGHN)
     } else {
       mi.error("L'enregistrement existe déjà")
+      return
     }
 
     if(mi.in.get("FILE")=="CSEAMA"){
       // Update CSEAMA DTID
-      DBAction query_CSEAMA = database.table("CSEAMA").index("00").build()
-      DBContainer CSEAMA = query_CSEAMA.getContainer()
+      DBAction queryCSEAMA = database.table("CSEAMA").index("00").build()
+      DBContainer CSEAMA = queryCSEAMA.getContainer()
       CSEAMA.set("HSCONO", currentCompany)
       CSEAMA.set("HSSEA1", mi.in.get("STKY"))
-      if (!query_CSEAMA.readLock(CSEAMA, updateCallBack_CSEAMA)) {
+      if (!queryCSEAMA.readLock(CSEAMA, updateCallBackCSEAMA)) {
         mi.error("L'enregistrement n'existe pas")
+        return
       }
     }
     // Update CSYTAB TXID
     if(mi.in.get("FILE")=="CSYTAB"){
-      DBAction query_CSYTAB = database.table("CSYTAB").index("00").build()
-      DBContainer CSYTAB = query_CSYTAB.getContainer()
+      DBAction queryCSYTAB = database.table("CSYTAB").index("00").build()
+      DBContainer CSYTAB = queryCSYTAB.getContainer()
       CSYTAB.set("CTCONO", currentCompany)
       CSYTAB.set("CTSTCO", "ITGR")
       CSYTAB.set("CTSTKY", mi.in.get("STKY"))
-      if (!query_CSYTAB.readLock(CSYTAB, updateCallBack_CSYTAB)) {
+      if (!queryCSYTAB.readLock(CSYTAB, updateCallBackCSYTAB)) {
         mi.error("L'enregistrement n'existe pas")
+        return
       }
     }
     mi.outData.put("DTID", dtid as String)
     mi.write()
   }
   // Retrieve CSLGHN
-  Closure<?> outData_CSLGHN = { DBContainer CSLGHN_0 ->
-    dtid = CSLGHN_0.get("JLDTID")
+  Closure<?> outDataCSLGHN = { DBContainer cslghn0 ->
+    dtid = cslghn0.get("JLDTID")
     dtid++
   }
   // Update CSYNUM
@@ -134,7 +137,7 @@ public class AddLngTxt extends ExtendM3Transaction {
     lockedResult.update()
   }
   // Update CSEAMA
-  Closure<?> updateCallBack_CSEAMA = { LockedResult lockedResult ->
+  Closure<?> updateCallBackCSEAMA = { LockedResult lockedResult ->
     LocalDateTime timeOfCreation = LocalDateTime.now()
     int changeNumber = lockedResult.get("HSCHNO")
     lockedResult.set("HSDTID", dtid)
@@ -144,7 +147,7 @@ public class AddLngTxt extends ExtendM3Transaction {
     lockedResult.update()
   }
   // Update CSYTAB
-  Closure<?> updateCallBack_CSYTAB = { LockedResult lockedResult ->
+  Closure<?> updateCallBackCSYTAB = { LockedResult lockedResult ->
     LocalDateTime timeOfCreation = LocalDateTime.now()
     int changeNumber = lockedResult.get("CTCHNO")
     lockedResult.set("CTTXID", dtid)
