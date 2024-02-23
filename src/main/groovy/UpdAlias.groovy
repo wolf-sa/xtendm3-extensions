@@ -6,6 +6,7 @@
  * Description : Update alias number in MMS025.
  * Date         Changed By   Description
  * 20240103     ARNREN       REFX05 API pour MMS025
+ * 20240221     ARNREN       useless selection removed
  */
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -61,7 +62,7 @@ public class UpdAlias extends ExtendM3Transaction {
 
         if (mi.in.get("ITNO") != "" && mi.in.get("ITNO") != null){
             itno = mi.in.get("ITNO")
-            DBAction query = database.table("MITMAS").index("00").selection("MMUNMS").build()
+            DBAction query = database.table("MITMAS").index("00").build()
             DBContainer MITMAS = query.getContainer()
             MITMAS.set("MMCONO", currentCompany)
             MITMAS.set("MMITNO",  mi.in.get("ITNO"))
@@ -107,7 +108,7 @@ public class UpdAlias extends ExtendM3Transaction {
         if (mi.in.get("SEQN") != "" && mi.in.get("SEQN") != null)
             seqn = mi.in.get("SEQN")
 
-        DBAction query = database.table("MITPOP").index("00").selection("MPCHNO", "MPCNQT", "MPALUN", "MPREMK").build()
+        DBAction query = database.table("MITPOP").index("00").selection("MPCHNO").build()
         DBContainer MITPOP = query.getContainer()
         MITPOP.set("MPCONO", currentCompany)
         MITPOP.set("MPALWT", alwt)

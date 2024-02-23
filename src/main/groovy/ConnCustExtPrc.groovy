@@ -6,6 +6,7 @@
  * Description : Connect customer external price.
  * Date         Changed By   Description
  * 20231004     ARENARD      GCOX02 - Connexion des prix externes aux clients
+ * 20240221     ARENARD      lowerCamelCase fixed, max record = 1 added for readAll on OPRICH
  */
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -176,17 +177,17 @@ public class ConnCustExtPrc extends ExtendM3Transaction {
             }
         }
 
-        DBAction OPRICH_query = database.table("OPRICH").index("00").build()
-        DBContainer OPRICH = OPRICH_query.getContainer()
+        DBAction queryOPRICH = database.table("OPRICH").index("00").build()
+        DBContainer OPRICH = queryOPRICH.getContainer()
         // Check Price list 1
         if (prr1 != "" && cuc1 != "") {
             OPRICH.set("OJCONO", currentCompany)
             OPRICH.set("OJPRRF", prr1)
             OPRICH.set("OJCUCD", cuc1)
             OPRICH.set("OJCUNO", cuno)
-            if (!OPRICH_query.readAll(OPRICH, 4, outData_OPRICH)) {
+            if (!queryOPRICH.readAll(OPRICH, 4, 1, outDataOPRICH)) {
                 OPRICH.set("OJCUNO", "")
-                if (!OPRICH_query.readAll(OPRICH, 4, outData_OPRICH)) {
+                if (!queryOPRICH.readAll(OPRICH, 4, 1, outDataOPRICH)) {
                     mi.error("Tarif 1 " + prr1 + " n'existe pas")
                     return
                 }
@@ -198,9 +199,9 @@ public class ConnCustExtPrc extends ExtendM3Transaction {
             OPRICH.set("OJPRRF", prr2)
             OPRICH.set("OJCUCD", cuc2)
             OPRICH.set("OJCUNO", cuno)
-            if (!OPRICH_query.readAll(OPRICH, 4, outData_OPRICH)) {
+            if (!queryOPRICH.readAll(OPRICH, 4, 1, outDataOPRICH)) {
                 OPRICH.set("OJCUNO", "")
-                if (!OPRICH_query.readAll(OPRICH, 4, outData_OPRICH)) {
+                if (!queryOPRICH.readAll(OPRICH, 4, 1, outDataOPRICH)) {
                     mi.error("Tarif 2 " + prr2 + " n'existe pas")
                     return
                 }
@@ -212,9 +213,9 @@ public class ConnCustExtPrc extends ExtendM3Transaction {
             OPRICH.set("OJPRRF", prr3)
             OPRICH.set("OJCUCD", cuc3)
             OPRICH.set("OJCUNO", cuno)
-            if (!OPRICH_query.readAll(OPRICH, 4, outData_OPRICH)) {
+            if (!queryOPRICH.readAll(OPRICH, 4, 1, outDataOPRICH)) {
                 OPRICH.set("OJCUNO", "")
-                if (!OPRICH_query.readAll(OPRICH, 4, outData_OPRICH)) {
+                if (!queryOPRICH.readAll(OPRICH, 4, 1, outDataOPRICH)) {
                     mi.error("Tarif 3 " + prr3 + " n'existe pas")
                     return
                 }
@@ -226,9 +227,9 @@ public class ConnCustExtPrc extends ExtendM3Transaction {
             OPRICH.set("OJPRRF", prr4)
             OPRICH.set("OJCUCD", cuc4)
             OPRICH.set("OJCUNO", cuno)
-            if (!OPRICH_query.readAll(OPRICH, 4, outData_OPRICH)) {
+            if (!queryOPRICH.readAll(OPRICH, 4, 1, outDataOPRICH)) {
                 OPRICH.set("OJCUNO", "")
-                if (!OPRICH_query.readAll(OPRICH, 4, outData_OPRICH)) {
+                if (!queryOPRICH.readAll(OPRICH, 4, 1, outDataOPRICH)) {
                     mi.error("Tarif 4 " + prr4 + " n'existe pas")
                     return
                 }
@@ -240,9 +241,9 @@ public class ConnCustExtPrc extends ExtendM3Transaction {
             OPRICH.set("OJPRRF", prr5)
             OPRICH.set("OJCUCD", cuc5)
             OPRICH.set("OJCUNO", cuno)
-            if (!OPRICH_query.readAll(OPRICH, 4, outData_OPRICH)) {
+            if (!queryOPRICH.readAll(OPRICH, 4, 1, outDataOPRICH)) {
                 OPRICH.set("OJCUNO", "")
-                if (!OPRICH_query.readAll(OPRICH, 4, outData_OPRICH)) {
+                if (!queryOPRICH.readAll(OPRICH, 4, 1, outDataOPRICH)) {
                     mi.error("Tarif 5 " + prr5 + " n'existe pas")
                     return
                 }
@@ -255,16 +256,16 @@ public class ConnCustExtPrc extends ExtendM3Transaction {
             OPRICH.set("OJPRRF", prr6)
             OPRICH.set("OJCUCD", cuc6)
             OPRICH.set("OJCUNO", cuno)
-            if (!OPRICH_query.readAll(OPRICH, 4, outData_OPRICH)) {
+            if (!queryOPRICH.readAll(OPRICH, 4, 1, outDataOPRICH)) {
                 OPRICH.set("OJCUNO", "")
-                if (!OPRICH_query.readAll(OPRICH, 4, outData_OPRICH)) {
+                if (!queryOPRICH.readAll(OPRICH, 4, 1, outDataOPRICH)) {
                     mi.error("Tarif 6 " + prr6 + " n'existe pas")
                     return
                 }
             }
         }
-        DBAction CSYTAB_query = database.table("CSYTAB").index("00").build()
-        DBContainer CSYTAB = CSYTAB_query.getContainer()
+        DBAction queryCSYTAB = database.table("CSYTAB").index("00").build()
+        DBContainer CSYTAB = queryCSYTAB.getContainer()
         // Check label flag 1
         if (lfl1 != "") {
             CSYTAB.set("CTCONO", currentCompany)
@@ -272,7 +273,7 @@ public class ConnCustExtPrc extends ExtendM3Transaction {
             CSYTAB.set("CTSTCO", "LFLA")
             CSYTAB.set("CTSTKY", lfl1)
             CSYTAB.set("CTLNCD", "")
-            if (!CSYTAB_query.read(CSYTAB)) {
+            if (!queryCSYTAB.read(CSYTAB)) {
                 mi.error("Etiquette 1 " + lfl1 + " n'existe pas")
                 return
             }
@@ -284,7 +285,7 @@ public class ConnCustExtPrc extends ExtendM3Transaction {
             CSYTAB.set("CTSTCO", "LFLA")
             CSYTAB.set("CTSTKY", lfl2)
             CSYTAB.set("CTLNCD", "")
-            if (!CSYTAB_query.read(CSYTAB)) {
+            if (!queryCSYTAB.read(CSYTAB)) {
                 mi.error("Etiquette 2 " + lfl2 + " n'existe pas")
                 return
             }
@@ -296,7 +297,7 @@ public class ConnCustExtPrc extends ExtendM3Transaction {
             CSYTAB.set("CTSTCO", "LFLA")
             CSYTAB.set("CTSTKY", lfl3)
             CSYTAB.set("CTLNCD", "")
-            if (!CSYTAB_query.read(CSYTAB)) {
+            if (!queryCSYTAB.read(CSYTAB)) {
                 mi.error("Etiquette 3 " + lfl3 + " n'existe pas")
                 return
             }
@@ -308,7 +309,7 @@ public class ConnCustExtPrc extends ExtendM3Transaction {
             CSYTAB.set("CTSTCO", "LFLA")
             CSYTAB.set("CTSTKY", lfl4)
             CSYTAB.set("CTLNCD", "")
-            if (!CSYTAB_query.read(CSYTAB)) {
+            if (!queryCSYTAB.read(CSYTAB)) {
                 mi.error("Etiquette 4 " + lfl4 + " n'existe pas")
                 return
             }
@@ -320,7 +321,7 @@ public class ConnCustExtPrc extends ExtendM3Transaction {
             CSYTAB.set("CTSTCO", "LFLA")
             CSYTAB.set("CTSTKY", lfl5)
             CSYTAB.set("CTLNCD", "")
-            if (!CSYTAB_query.read(CSYTAB)) {
+            if (!queryCSYTAB.read(CSYTAB)) {
                 mi.error("Etiquette 5 " + lfl5 + " n'existe pas")
                 return
             }
@@ -332,7 +333,7 @@ public class ConnCustExtPrc extends ExtendM3Transaction {
             CSYTAB.set("CTSTCO", "LFLA")
             CSYTAB.set("CTSTKY", lfl6)
             CSYTAB.set("CTLNCD", "")
-            if (!CSYTAB_query.read(CSYTAB)) {
+            if (!queryCSYTAB.read(CSYTAB)) {
                 mi.error("Etiquette 6 " + lfl6 + " n'existe pas")
                 return
             }
@@ -372,7 +373,7 @@ public class ConnCustExtPrc extends ExtendM3Transaction {
         }
     }
     // Retrieve OPRICH
-    Closure<?> outData_OPRICH = { DBContainer OPRICH ->
+    Closure<?> outDataOPRICH = { DBContainer OPRICH ->
     }
     // Update OCUSEP
     Closure<?> updateCallBack = { LockedResult lockedResult ->

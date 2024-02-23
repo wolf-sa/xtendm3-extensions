@@ -6,6 +6,7 @@
  * Description : Add records to the CPARTN table (CRS885).
  * Date         Changed By   Description
  * 20221129     RENARN       REFX04 - API for CRS885
+ * 20240221     RENARN       Useless timeOfCreation removed, method header comments added
  */
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -68,7 +69,6 @@ public class AddPartner extends ExtendM3Transaction {
                 mi.error("ID partenaire niveau supérieur non autorisé pour le type " + (mi.in.get("PATE")))
                 return
             } else {
-                LocalDateTime timeOfCreation = LocalDateTime.now()
                 DBAction query = database.table("CPARTN").index("00").build()
                 DBContainer CPARTN = query.getContainer()
                 CPARTN.set("CHCONO", currentCompany)
@@ -161,6 +161,7 @@ public class AddPartner extends ExtendM3Transaction {
         }
     }
 
+    // Validate
     public void RVALA() {
         IN60 = false
         XXMSID = ""
@@ -241,6 +242,7 @@ public class AddPartner extends ExtendM3Transaction {
         }
     }
 
+    //Check file
     public void RCHK() {
         if (XXFILE == "CMNDIV") {
             DBAction query = database.table("CMNDIV").index("00").build()

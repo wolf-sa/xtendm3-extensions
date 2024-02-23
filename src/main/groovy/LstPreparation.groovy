@@ -6,6 +6,8 @@
  * Description : Lst preparation
  * Date         Changed By   Description
  * 20231020     APACE        LOGM01-Mashup Libération BP
+ * 20240221     RENARN       nbrMaxOfRecords added
+ * 20240223     RENARN       nbrMaxOfRecords has been set to 10000
  */
 public class LstPreparation extends ExtendM3Transaction {
 
@@ -13,6 +15,7 @@ public class LstPreparation extends ExtendM3Transaction {
     private final DatabaseAPI database
     private final LoggerAPI logger
     private final ProgramAPI program
+    private Integer nbrMaxOfRecords = 10000
 
     public LstPreparation(MIAPI mi, DatabaseAPI database, LoggerAPI logger, ProgramAPI program) {
         this.mi = mi
@@ -142,7 +145,7 @@ public class LstPreparation extends ExtendM3Transaction {
             }
         }
 
-        if(!query.readAll(MHDISH, 1, outData)){
+        if(!query.readAll(MHDISH, 1, nbrMaxOfRecords, outData)){
             mi.error("L'enregistrement n'existe pas")
             return
         }

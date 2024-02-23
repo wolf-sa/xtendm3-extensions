@@ -7,6 +7,7 @@
  * Date         Changed By   Description
  * 20231003     ARENARD      GCOX01 – Mise à jour des champs paramétrables dans les en-têtes de commande
  * 20231102     ARENARD      New input parameter TEPA
+ * 20240221     ARENARD      logger.info removed, lowerCamelCase fixed, date check added
  */
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -21,6 +22,9 @@ public class ChgOrderHead extends ExtendM3Transaction {
     private final MICallerAPI miCaller
     private final UtilityAPI utility
     private String lncd
+    private String uid1
+    private String uid2
+    private String uid3
 
     public ChgOrderHead(MIAPI mi, DatabaseAPI database, ProgramAPI program, MICallerAPI miCaller, UtilityAPI utility, LoggerAPI logger) {
         this.mi = mi
@@ -32,7 +36,7 @@ public class ChgOrderHead extends ExtendM3Transaction {
     }
 
     public void main() {
-        logger.info("Début performActualJob")
+        logger.debug("Début performActualJob")
         Integer currentCompany
         if (mi.in.get("CONO") == null) {
             currentCompany = (Integer)program.getLDAZD().CONO
@@ -42,11 +46,11 @@ public class ChgOrderHead extends ExtendM3Transaction {
 
         // Retrieve language from order head
         String lncd = ""
-        DBAction OOHEAD_query = database.table("OOHEAD").index("00").selection("OAORNO","OALNCD").build()
-        DBContainer OOHEAD = OOHEAD_query.getContainer()
+        DBAction queryOOHEAD = database.table("OOHEAD").index("00").selection("OAORNO","OALNCD").build()
+        DBContainer OOHEAD = queryOOHEAD.getContainer()
         OOHEAD.set("OACONO", currentCompany)
         OOHEAD.set("OAORNO", mi.in.get("ORNO"))
-        if(OOHEAD_query.read(OOHEAD)){
+        if(queryOOHEAD.read(OOHEAD)){
             lncd = OOHEAD.get("OALNCD")
         }
 
@@ -61,6 +65,33 @@ public class ChgOrderHead extends ExtendM3Transaction {
             CSYTAB.set("CTLNCD",  lncd)
             if (!query.read(CSYTAB)) {
                 mi.error("Modalité de conditionnement " + mi.in.get("TEPA") + " n'existe pas")
+                return
+            }
+        }
+
+        // Check date 1
+        if(mi.in.get("UID1") != null && mi.in.get("UID1") != "0") {
+            uid1 = mi.in.get("UID1")
+            if (!utility.call("DateUtil", "isDateValid", uid1, "yyyyMMdd")) {
+                mi.error("Date 1 est invalide")
+                return
+            }
+        }
+
+        // Check date 2
+        if(mi.in.get("UID2") != null && mi.in.get("UID2") != "0") {
+            uid2 = mi.in.get("UID2")
+            if (!utility.call("DateUtil", "isDateValid", uid2, "yyyyMMdd")) {
+                mi.error("Date 2 est invalide")
+                return
+            }
+        }
+
+        // Check date 3
+        if(mi.in.get("UID3") != null && mi.in.get("UID3") != "0") {
+            uid3 = mi.in.get("UID3")
+            if (!utility.call("DateUtil", "isDateValid", uid3, "yyyyMMdd")) {
+                mi.error("Date 3 est invalide")
                 return
             }
         }
@@ -96,8 +127,9 @@ public class ChgOrderHead extends ExtendM3Transaction {
             lockedResult.update()
         }
 
-        if(!OOHEAD_query.readLock(OOHEAD, updateCallBack)) {
+        if(!queryOOHEAD.readLock(OOHEAD, updateCallBack)) {
             mi.error("Le numéro de commande " + mi.in.get("ORNO") + " n'existe pas")
+            return
         }
     }
 }
